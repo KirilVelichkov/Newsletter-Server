@@ -1,11 +1,11 @@
 'use strict';
 
-module.exports = function ({data, encryption}) {
+module.exports = function ({grid, database, data, encryption}) {
     return {
         _validateToken(req, res) {
             let token = req.headers.authorization;
             if (!token) {
-                return res.status(401).json({
+                return res.json({
                     success: false,
                     message: 'You must be loged in order to vote'
                 });
@@ -13,65 +13,78 @@ module.exports = function ({data, encryption}) {
             token = token.substring(1, token.length - 1);
             let user = encryption.deciferToken(token);
             if (!user) {
-                return res.status(401).json({
+                return res.json({
                     success: false,
                     message: 'You must be loged in order to vote'
                 });
             }
         },
         updatePrivateInfo(req, res) {
+            let gfs = grid(database.connection.db, database.mongo);
+            console.log(req.file);
+
             if (!req.user) {
-                res.status(401).json({
+                return res.json({
                     succes: false,
                     message: 'Please enter your credentials'
                 });
-                return;
             }
 
             let user = req.user;
             let userHash = req.user.passHash;
 
-            let hashedEnteredPassword = user.generatePassHash(req.body.currentPassword);
-            if (userHash !== hashedEnteredPassword) {
-                res.status(401).json({
-                    succes: false,
-                    message: 'Please enter valid credentials'
-                });
-                return;
-            }
+            // let hashedEnteredPassword = user.generatePassHash(req.body.currentPassword);
+            // if (userHash !== hashedEnteredPassword) {
+            //     return res.json({
+            //         succes: false,
+            //         message: 'Please enter valid credentials'
+            //     });
+            // }
 
             let newUserHash = false;
 
             if (req.body.newPassword) {
                 newUserHash = user.generatePassHash(req.body.newPassword);
             }
+            console.log(req.file);
+            console.log(' ');
+            console.log(' ');
+            console.log(' ');
+            console.log(' ');
+            console.log(' ');
 
-            let infoToUpdate = {
-                email: req.body.email,
-                passHash: newUserHash
-            };
+            let file = req.file.buffer;
 
-            data.updateUserPrivateInfo(user._id, infoToUpdate)
-                .then(result => {
-                    res.status(201).json({
-                        succes: true,
-                        message: 'Userinfo has been updated successfullyF'
+            gfs.writeFile({}, file.buffer, (_, foundFile) => {
+                let avatar = foundFile._id;
+
+                let infoToUpdate = {
+                    email: req.body.email,
+                    passHash: newUserHash,
+                    avatar: avatar
+                };
+
+                data.updateUserPrivateInfo(user._id, infoToUpdate)
+                    .then(result => {
+                        return res.status(201).json({
+                            succes: true,
+                            message: 'Userinfo has been updated successfully'
+                        });
+                    })
+                    .catch(() => {
+                        return res.json({
+                            succes: false,
+                            message: 'User with the same email already exists!'
+                        });
                     });
-                })
-                .catch(err => {
-                    res.status(400).json({
-                        succes: false,
-                        message: 'User with the same email already exists!'
-                    });
-                });
+            });
         },
         getUserCourses(req, res) {
             let username = req.params.username;
 
             data.getUserCourses(username)
                 .then((result) => {
-                    console.log(result);
-                    res.status(200).json(result)
+                    return res.status(200).json(result)
                 });
         },
         addFactToFavorites(req, res) {
@@ -88,7 +101,7 @@ module.exports = function ({data, encryption}) {
             let passwordFromReq = req.body.currentPassword;
 
             if (!passwordFromReq) {
-                res.status(401).json({
+                return res.json({
                     succes: false,
                     message: 'Password is not valid'
                 });
@@ -96,10 +109,10 @@ module.exports = function ({data, encryption}) {
 
             data.uploadAvatar(username, img, passwordFromReq)
                 .then(user => {
-                    res.status(200).send(img);
+                    return res.status(200).send(img);
                 })
-                .catch((err) => {
-                    res.status(401).json({
+                .catch(() => {
+                    return res.json({
                         succes: false,
                         message: 'Password is not valid'
                     });

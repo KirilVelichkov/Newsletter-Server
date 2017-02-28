@@ -127,6 +127,7 @@ module.exports = (models) => {
 
                         userFromId.passHash = info.passHash || userFromId.passHash;
                         userFromId.email = info.email || userFromId.email;
+                        userFromId.avatar = info.avatar || userFromId.avatar;
 
                         userFromId.save();
                         resolve(userFromId);

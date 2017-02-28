@@ -3,7 +3,7 @@ const multer = require('multer');
 const path = require('path');
 const router = require('express').Router();
 
-module.exports = function ({ app, controllers, passport, auth }) {
+module.exports = function ({ upload, app, controllers, passport, auth }) {
     const userController = controllers.user;
     let img = '';
 
@@ -22,7 +22,7 @@ module.exports = function ({ app, controllers, passport, auth }) {
     });
 
     router
-        .put('/user/:id', auth.isAuthenticated(), userController.updatePrivateInfo)
+        .put('/updateSettings', upload.single('avatar'), auth.isAuthenticated(), userController.updatePrivateInfo)
         .get('/user/:username/courses', auth.isAuthenticated(), userController.getUserCourses)
         .post('/user/:username/favorites', auth.isAuthenticated(), userController.addFactToFavorites)
         .get('/user/:username/avatar', auth.isAuthenticated(), userController.getAvatar)
