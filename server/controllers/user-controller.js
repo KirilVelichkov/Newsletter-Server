@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function ({grid, database, data, encryption}) {
+module.exports = function ({ grid, database, data, encryption }) {
     return {
         _validateToken(req, res) {
             let token = req.headers.authorization;
@@ -33,27 +33,13 @@ module.exports = function ({grid, database, data, encryption}) {
             let user = req.user;
             let userHash = req.user.passHash;
 
-            // let hashedEnteredPassword = user.generatePassHash(req.body.currentPassword);
-            // if (userHash !== hashedEnteredPassword) {
-            //     return res.json({
-            //         succes: false,
-            //         message: 'Please enter valid credentials'
-            //     });
-            // }
-
             let newUserHash = false;
 
             if (req.body.newPassword) {
                 newUserHash = user.generatePassHash(req.body.newPassword);
             }
-            console.log(req.file);
-            console.log(' ');
-            console.log(' ');
-            console.log(' ');
-            console.log(' ');
-            console.log(' ');
 
-            let file = req.file.buffer;
+            let file = req.file;
 
             gfs.writeFile({}, file.buffer, (_, foundFile) => {
                 let avatar = foundFile._id;
@@ -79,51 +65,25 @@ module.exports = function ({grid, database, data, encryption}) {
                     });
             });
         },
-        getUserCourses(req, res) {
-            let username = req.params.username;
-
-            data.getUserCourses(username)
-                .then((result) => {
-                    return res.status(200).json(result)
-                });
-        },
-        addFactToFavorites(req, res) {
-            let username = req.params.username;
-            let fact = req.body.fact;
-
-            data.addFactToFavorites(username, fact);
-
-        },
-        uploadAvatar(req, res, img) {
-            this._validateToken(req, res);
-
-            let username = req.body.username;
-            let passwordFromReq = req.body.currentPassword;
-
-            if (!passwordFromReq) {
-                return res.json({
-                    succes: false,
-                    message: 'Password is not valid'
-                });
-            }
-
-            data.uploadAvatar(username, img, passwordFromReq)
-                .then(user => {
-                    return res.status(200).send(img);
-                })
-                .catch(() => {
-                    return res.json({
-                        succes: false,
-                        message: 'Password is not valid'
-                    });
-                });
-
-        },
         getAvatar(req, res) {
-            let username = req.params.username;
+            var gfs = grid(database.connection.db, database.mongo);
 
-            data.getAvatar(username)
-                .then(result => res.status(200).json(result));
+            var options = {
+                _id: req.params.id
+            };
+
+            gfs.exist(options, (_, exists) => {
+                if (!exists) {
+                    res.status(404);
+                    res.end();
+                } else {
+                    var readstream = gfs.createReadStream(options);
+
+                    res.set('Content-Type', 'image/jpeg');
+
+                    readstream.pipe(res);
+                }
+            });
         }
     };
 };

@@ -51,12 +51,12 @@ module.exports = function ({ grid, database, data, encryption }) {
 
             let pattern = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             if (!pattern.test(email)) {
-               return res.json({ success: false, message: 'Email is not valid' });
+                return res.json({ success: false, message: 'Email is not valid' });
             }
 
             const salt = encryption.generateSalt();
             const passHash = encryption.generateHashedPassword(salt, password);
-            let file = req.file.buffer;
+            let file = req.file;
 
             gfs.writeFile({}, file.buffer, (_, foundFile) => {
                 let avatar = foundFile._id;
@@ -102,7 +102,7 @@ module.exports = function ({ grid, database, data, encryption }) {
                     message: 'Please provide token'
                 });
             }
-            
+
             let user = {
                 username: req.user.username,
                 avatar: req.user.avatar,
@@ -110,7 +110,7 @@ module.exports = function ({ grid, database, data, encryption }) {
                 roles: req.user.roles,
                 isBlocked: req.user.isBlocked
             };
-            
+
             return res.status(200).json(user);
         }
     };

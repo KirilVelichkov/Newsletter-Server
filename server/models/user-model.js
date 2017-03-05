@@ -50,6 +50,11 @@ const userSchema = new mongoose.Schema({
         default: 'default-avatar.png'
     },
     roles: [String],
+    articles: [{
+        title: String,
+        content: String,
+        image: String
+    }],
     isBlocked: {
         type: Boolean,
         default: false

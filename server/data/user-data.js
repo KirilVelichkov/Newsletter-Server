@@ -2,8 +2,8 @@
 'use strict';
 
 module.exports = (models) => {
-    const {User} = models;
-    const {Course} = models;
+    const { User } = models;
+    const { Article } = models;
 
     return {
         getAll() {
@@ -69,55 +69,7 @@ module.exports = (models) => {
                 });
             });
         },
-        addFactToFavorites(username, fact) {
-            this.getByUsername(username)
-                .then(user => {
-                    user.favoriteFacts.push(fact);
-                    user.save();
-                });
-        },
-        getUserCourses(username) {
-            return new Promise((resolve, reject) => {
-                this.getByUsername(username)
-                    .then(result => {
-                        let coursesIds = [];
-                        result.courses.forEach(function (courseId) {
-                            coursesIds.push(courseId);
-                        });
-                        Course.find({ '_id': { $in: coursesIds } }, (err, courses) => {
-                            console.log('test', courses);
-                            resolve(courses);
-                        });
-                    });
-
-            });
-
-        },
-        uploadAvatar(username, img, password) {
-            return new Promise((resolve, reject) => {
-                this.getByUsername(username)
-                    .then(user => {
-                        let passHashFromReq = user.generatePassHash(password);
-                        if (passHashFromReq !== user.passHash) {
-                            return reject();
-                        }
-
-                        user.avatar = img;
-                        user.save();
-                        resolve(user);
-                    });
-            });
-        },
-        getAvatar(username) {
-            return new Promise((resolve, reject) => {
-                this.getByUsername(username)
-                    .then(result => {
-                        resolve(result.avatar);
-                    });
-            });
-        },
         updateUserPrivateInfo(id, info) {
-
             return new Promise((resolve, reject) => {
                 Promise.all([this.getUserById(id), this.getUserByEmail(info.email)])
                     .then(([userFromId, userFromMail]) => {

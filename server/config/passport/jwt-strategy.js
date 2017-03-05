@@ -15,6 +15,6 @@ module.exports = (passport, data, config) => {
                 } else {
                     done(null, false);
                 }
-            });      
+            });
     }));
 };

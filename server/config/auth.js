@@ -9,7 +9,7 @@ module.exports = {
             if (req.user && !req.user.isBlocked) {
                 next();
             } else {
-               return res.json({
+                return res.json({
                     succes: false,
                     message: 'Your account has been blocked!'
                 });
@@ -20,7 +20,7 @@ module.exports = {
             if (req.user && req.user.roles.indexOf(role) > -1) {
                 next();
             } else {
-               return res.json({
+                return res.json({
                     succes: false,
                     message: 'You do not have admin rights!'
                 });
