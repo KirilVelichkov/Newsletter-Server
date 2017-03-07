@@ -10,7 +10,7 @@ module.exports = function ({ upload, app, controllers, auth }) {
         .get('/article/:id', articleController.getArticleById)
         .get('/image/:id', articleController.getImage)
         .get('/all', articleController.getAllArticles)
-        .post('/create', upload.single('image'), auth.isAuthenticated(), articleController.createArticle);
+        .post('/create', upload.single('image'), auth.isAuthenticated(), auth.isInRole('admin'), articleController.createArticle);
 
     app.use('/api/article', router);
 };

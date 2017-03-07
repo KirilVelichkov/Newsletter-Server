@@ -9,7 +9,7 @@ module.exports = (models) => {
         getArticleById(id) {
             return new Promise((resolve, reject) => {
                 let result = Article.find({ _id: id });
-               
+
                 resolve(result);
             });
         },

@@ -42,9 +42,9 @@ module.exports = function ({ grid, database, data, encryption }) {
         },
 
         getImage(req, res) {
-            var gfs = grid(database.connection.db, database.mongo);
+            let gfs = grid(database.connection.db, database.mongo);
 
-            var options = {
+            let options = {
                 _id: req.params.id
             };
 
