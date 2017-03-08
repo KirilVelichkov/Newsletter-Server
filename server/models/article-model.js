@@ -22,12 +22,15 @@ const articleSchema = new mongoose.Schema({
         require: true
     },
     category: {
-        type: [String],
+        type: String,
         required: true
     },
     date: {
         type: Date,
         default: Date.now
+    },
+    tags: {
+        type: [String]
     },
     comments: [{
         content: String,

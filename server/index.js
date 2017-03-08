@@ -7,13 +7,15 @@ const stage = 'development'; //process.env.NODE_ENV ||
 const config = require('./config/config')[stage];
 const passport = require('passport');
 const grid = require('gridfs');
-let multer = require('multer');
-let storage = multer.memoryStorage();
+const multer = require('multer');
 const data = require('./data')();
 const cors = require('cors');
 const auth = require('./config/auth');
 const database = require('./config/database')(config);
+
+let storage = multer.memoryStorage();
 let upload = multer({ storage: storage });
+
 app.use(cors());
 
 const encryption = require('./utilities/encryption');

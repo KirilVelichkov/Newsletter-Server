@@ -94,8 +94,11 @@ module.exports = function ({ grid, database, data, encryption }) {
                 message: `User ${req.body.username} is logged out succesfully`
             });
         },
+        getUserRoles(req, res) {
+            return res.status(200).json(req.user.roles);
+        },
         getLoggedUser(req, res) {
-            
+
             if (!req.user) {
                 return res.status(200).json({
                     success: false,
