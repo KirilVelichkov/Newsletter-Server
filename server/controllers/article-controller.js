@@ -32,6 +32,26 @@ module.exports = function ({ grid, database, data, encryption }) {
                     return res.status(200).json(result);
                 });
         },
+        getImage(req, res) {
+            let gfs = grid(database.connection.db, database.mongo);
+
+            let options = {
+                _id: req.params.id
+            };
+
+            gfs.exist(options, (_, exists) => {
+                if (!exists) {
+                    res.status(404);
+                    res.end();
+                } else {
+                    var readstream = gfs.createReadStream(options);
+
+                    res.set('Content-Type', 'image/jpeg');
+
+                    readstream.pipe(res);
+                }
+            });
+        },
         createArticle(req, res, next) {
 
             let gfs = grid(database.connection.db, database.mongo);
@@ -56,26 +76,41 @@ module.exports = function ({ grid, database, data, encryption }) {
                     });
             });
         },
+        addComment(req, res, next) {
+            let articleId = req.params.articleId;
 
-        getImage(req, res) {
-            let gfs = grid(database.connection.db, database.mongo);
+            let comment = {
+                content: req.body.content,
+                author: req.user.username,
+                authorAvatar: req.user.avatar
+            }
+            console.log(req.url);
 
-            let options = {
-                _id: req.params.id
-            };
+            return data.addComment(articleId, comment)
+                .then((c) => {
+                    return res.status(201).json({
+                        success: true,
+                        message: 'Comment added!'
+                    });
+                });
+        },
+        replyComment(req, res, next) {
+            let articleId = req.params.articleId;
+            let commentId = req.params.commentId;
 
-            gfs.exist(options, (_, exists) => {
-                if (!exists) {
-                    res.status(404);
-                    res.end();
-                } else {
-                    var readstream = gfs.createReadStream(options);
+            let comment = {
+                content: req.body.content,
+                author: req.user.username,
+                authorAvatar: req.user.avatar
+            }
 
-                    res.set('Content-Type', 'image/jpeg');
-
-                    readstream.pipe(res);
-                }
-            });
+            return data.replyComment(articleId, commentId, comment)
+                .then((c) => {
+                    return res.status(201).json({
+                        success: true,
+                        message: 'Comment added!'
+                    });
+                });
         }
     };
 };

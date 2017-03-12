@@ -3,6 +3,7 @@
 'use strict';
 
 const mongoose = require('mongoose');
+mongoose.Promise = global.Promise;
 
 const articleSchema = new mongoose.Schema({
     title: {
@@ -33,13 +34,36 @@ const articleSchema = new mongoose.Schema({
         type: [String]
     },
     comments: [{
+        _id: {
+            type: mongoose.Schema.Types.ObjectId,
+            index: true,
+            required: true,
+            auto: true
+        },
+
         content: String,
         date: {
             type: Date,
             default: Date.now
         },
-        author: String
-    }]
+        author: String,
+        authorAvatar: String,
+
+        replies: [{
+            content: String,
+            date: {
+                type: Date,
+                default: Date.now
+            },
+            author: String,
+            authorAvatar: String
+        }]
+
+    }],
+    isDeleted: {
+        type: Boolean,
+        default: false
+    }
 });
 
 mongoose.model('Article', articleSchema);

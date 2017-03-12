@@ -8,14 +8,14 @@ module.exports = (models) => {
     return {
         getArticleById(id) {
             return new Promise((resolve, reject) => {
-                let result = Article.findOne({ _id: id });
+                let result = Article.findOne({ _id: id, isDeleted: false });
 
                 resolve(result);
             });
         },
         getAllArticles() {
             return new Promise((resolve, reject) => {
-                let result = Article.find({});
+                let result = Article.find({ isDeleted: false });
 
                 resolve(result);
             });
@@ -31,7 +31,8 @@ module.exports = (models) => {
                         { author: { $regex: filter, $options: 'i' } },
                         { content: { $regex: filter, $options: 'i' } },
                         { tags: { $regex: filter, $options: 'i' } }
-                    ]
+                    ],
+                    '$and': [{ isDeleted: false }]
                 }
 
                 let result = Article.find(search);
@@ -42,7 +43,7 @@ module.exports = (models) => {
         getArticlesByCategory(category) {
             return new Promise((resolve, reject) => {
 
-                let result = Article.find({category});
+                let result = Article.find({ category, isDeleted: false });
 
                 resolve(result);
             });
@@ -66,6 +67,20 @@ module.exports = (models) => {
                     return resolve(article);
                 });
             });
+        },
+        addComment(articleId, comment) {
+            return this.getArticleById(articleId)
+                .then((foundArticle) => {
+                    foundArticle.comments.push(comment);
+                    foundArticle.save();
+                })
+        },
+        replyComment(articleId, commentId, comment) {
+            return this.getArticleById(articleId)
+                .then((foundArticle) => {
+                    foundArticle.comments.find(x => x._id == commentId).replies.push(comment);
+                    foundArticle.save();
+                });
         }
     };
 };

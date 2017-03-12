@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 
 module.exports = (config) => {
-     mongoose.Promise = global.Promise;
      mongoose.connect(config.connectionString);
 
     let db = mongoose.connection;

@@ -9,6 +9,8 @@ const fieldsValidator = require('./utils/validator');
 const MinUsernameLength = 3;
 const MaxUsernameLength = 20;
 
+mongoose.Promise = global.Promise;
+
 function hasRole(user, role) {
     return user.roles.indexOf(role.toLowerCase()) >= 0;
 }
