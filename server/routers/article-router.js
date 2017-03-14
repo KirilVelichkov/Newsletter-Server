@@ -11,10 +11,13 @@ module.exports = function ({ upload, app, controllers, auth }) {
         .get('/image/:id', articleController.getImage)
         .get('/category/:category', articleController.getArticlesByCategory)
         .get('/all', articleController.getAllArticles)
+        .get('/all/count', articleController.getAllArticlesCount)
+        .get('/all/:pageNumber&:pageSize', articleController.getArticlesByPageAndSize)
         .get('/search/:filter', articleController.getFilteredArticles)
         .post('/create', upload.single('image'), auth.isAuthenticated(), auth.isInRole('admin'), articleController.createArticle)
         .post('/replyComment/:articleId/:commentId', auth.isAuthenticated(), articleController.replyComment)
-        .post('/addComment/:articleId', auth.isAuthenticated(), articleController.addComment);
-
+        .post('/addComment/:articleId', auth.isAuthenticated(), articleController.addComment)
+        .put('/update/:id', upload.single('image'), auth.isAuthenticated(), auth.isInRole('admin'), articleController.updateArticle);
+    
     app.use('/api/article', router);
 };

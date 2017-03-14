@@ -8,14 +8,14 @@ module.exports = (models) => {
     return {
         getArticleById(id) {
             return new Promise((resolve, reject) => {
-                let result = Article.findOne({ _id: id, isDeleted: false });
+                let result = Article.findOne({ _id: id });
 
                 resolve(result);
             });
         },
         getAllArticles() {
             return new Promise((resolve, reject) => {
-                let result = Article.find({ isDeleted: false });
+                let result = Article.find({});
 
                 resolve(result);
             });
@@ -79,6 +79,37 @@ module.exports = (models) => {
             return this.getArticleById(articleId)
                 .then((foundArticle) => {
                     foundArticle.comments.find(x => x._id == commentId).replies.push(comment);
+                    foundArticle.save();
+                });
+        },
+        getArticlesByPageAndSize(pageNumber, pageSize) {
+            let skip = (+pageNumber - 1) * +pageSize;
+            let limit = +pageSize;
+
+            return new Promise((resolve, reject) => {
+                let result = Article.find({ isDeleted: false })
+                    .skip(skip)
+                    .limit(limit);
+
+                resolve(result);
+            });
+        },
+        getAllArticlesCount() {
+            return new Promise((resolve, reject) => {
+                let result = Article.count({ isDeleted: false });
+
+                resolve(result);
+            });
+        },
+        updateArticle(articleId, title, content, image, category, isDeleted) {
+            return this.getArticleById(articleId)
+                .then((foundArticle) => {
+                    foundArticle.title = title || foundArticle.title;
+                    foundArticle.content = content || foundArticle.contnet;
+                    foundArticle.image = image || foundArticle.image;
+                    foundArticle.category = category || foundArticle.category;
+                    foundArticle.isDeleted = isDeleted;
+
                     foundArticle.save();
                 });
         }

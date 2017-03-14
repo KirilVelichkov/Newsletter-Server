@@ -111,6 +111,65 @@ module.exports = function ({ grid, database, data, encryption }) {
                         message: 'Comment added!'
                     });
                 });
+        },
+        getArticlesByPageAndSize(req, res) {
+            let pageNumber = req.params.pageNumber;
+            let pageSize = req.params.pageSize;
+
+            data.getArticlesByPageAndSize(pageNumber, pageSize)
+                .then((result) => {
+                    return res.status(200).json(result);
+                });
+        },
+        getAllArticlesCount(req, res) {
+            data.getAllArticlesCount()
+                .then((result) => {
+                    return res.status(200).json(result);
+                });
+        },
+        updateArticle(req, res) {
+            let gfs = grid(database.connection.db, database.mongo);
+
+            let articleId = req.params.id;
+
+            let title = req.body.title;
+            let content = req.body.content;
+            let file = req.file;
+            let category = req.body.category;
+            let isDeleted = req.body.isDeleted;
+            console.log(isDeleted);
+            
+            if (isDeleted) {
+                isDeleted = true;
+            } else {
+                isDeleted = false;
+            }
+            console.log(isDeleted);
+            if (file) {
+                console.log('image');
+                
+                gfs.writeFile({}, file.buffer, (_, foundFile) => {
+                    let image = foundFile._id;
+
+                    data.updateArticle(articleId, title, content, image, category, isDeleted)
+                        .then(() => {
+                            return res.status(201).json({
+                                success: true,
+                                message: 'Article updated!'
+                            });
+                        });
+                });
+            } else {
+                data.updateArticle(articleId, title, content, false, category, isDeleted)
+                    .then(() => {
+                        return res.status(201).json({
+                            success: true,
+                            message: 'Article updated!'
+                        });
+                    });
+            }
+
         }
+
     };
 };
