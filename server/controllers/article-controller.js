@@ -26,8 +26,10 @@ module.exports = function ({ grid, database, data, encryption }) {
         },
         getArticlesByCategory(req, res) {
             let category = req.params.category.toUpperCase();
-
-            data.getArticlesByCategory(category)
+            let pageNumber = req.params.pageNumber;
+            let pageSize = req.params.pageSize;
+            
+            data.getArticlesByCategory(category, pageNumber, pageSize)
                 .then((result) => {
                     return res.status(200).json(result);
                 });
@@ -112,6 +114,12 @@ module.exports = function ({ grid, database, data, encryption }) {
                     });
                 });
         },
+        getAllArticlesCount(req, res) {
+            data.getAllArticlesCount()
+                .then((result) => {
+                    return res.status(200).json(result);
+                });
+        },
         getArticlesByPageAndSize(req, res) {
             let pageNumber = req.params.pageNumber;
             let pageSize = req.params.pageSize;
@@ -121,8 +129,10 @@ module.exports = function ({ grid, database, data, encryption }) {
                     return res.status(200).json(result);
                 });
         },
-        getAllArticlesCount(req, res) {
-            data.getAllArticlesCount()
+        getAllArticlesCountByCategory(req, res) {
+            let category = req.params.category;
+            
+            data.getAllArticlesCountByCategory(category)
                 .then((result) => {
                     return res.status(200).json(result);
                 });

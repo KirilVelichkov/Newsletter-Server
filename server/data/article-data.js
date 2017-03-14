@@ -40,10 +40,15 @@ module.exports = (models) => {
                 resolve(result);
             });
         },
-        getArticlesByCategory(category) {
-            return new Promise((resolve, reject) => {
+        getArticlesByCategory(category, pageNumber, pageSize) {
+            let skip = (+pageNumber - 1) * +pageSize;
+            let limit = +pageSize;
 
-                let result = Article.find({ category, isDeleted: false });
+            return new Promise((resolve, reject) => {
+                let result =
+                    Article.find({ category, isDeleted: false })
+                        .skip(skip)
+                        .limit(limit);
 
                 resolve(result);
             });
@@ -87,9 +92,10 @@ module.exports = (models) => {
             let limit = +pageSize;
 
             return new Promise((resolve, reject) => {
-                let result = Article.find({ isDeleted: false })
-                    .skip(skip)
-                    .limit(limit);
+                let result =
+                    Article.find({ isDeleted: false })
+                        .skip(skip)
+                        .limit(limit);
 
                 resolve(result);
             });
@@ -97,6 +103,14 @@ module.exports = (models) => {
         getAllArticlesCount() {
             return new Promise((resolve, reject) => {
                 let result = Article.count({ isDeleted: false });
+
+                resolve(result);
+            });
+        },
+        getAllArticlesCountByCategory(category) {
+            category = category.toUpperCase();
+            return new Promise((resolve, reject) => {
+                let result = Article.count({ isDeleted: false, category });
 
                 resolve(result);
             });
