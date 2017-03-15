@@ -25,9 +25,9 @@ module.exports = function ({ grid, database, data, encryption }) {
                 });
         },
         getArticlesByCategory(req, res) {
-            let category = req.params.category.toUpperCase();
-            let pageNumber = req.params.pageNumber;
-            let pageSize = req.params.pageSize;
+            let category = req.query.category.toUpperCase();
+            let pageNumber = req.query.pageNumber;
+            let pageSize = req.query.pageSize;
             
             data.getArticlesByCategory(category, pageNumber, pageSize)
                 .then((result) => {
@@ -121,11 +121,13 @@ module.exports = function ({ grid, database, data, encryption }) {
                 });
         },
         getArticlesByPageAndSize(req, res) {
-            let pageNumber = req.params.pageNumber;
-            let pageSize = req.params.pageSize;
-
+            let pageNumber = req.query.pageNumber;
+            let pageSize = req.query.pageSize;
+            
             data.getArticlesByPageAndSize(pageNumber, pageSize)
                 .then((result) => {
+                    console.log(result);
+                    
                     return res.status(200).json(result);
                 });
         },
